@@ -330,7 +330,14 @@ def test_fast_mode_off_by_default():
 
 
 @pytest.mark.parametrize(
-    "model_id", ("claude-opus-5", "claude-sonnet-5", "claude-fable-5")
+    "model_id",
+    (
+        "claude-opus-5",
+        "claude-sonnet-5",
+        "claude-fable-5",
+        "claude-opus-5-5",
+        "claude-sonnet-5-5",
+    ),
 )
 def test_claude_5_registered(model_id):
     model = llm.get_model(model_id)
@@ -347,6 +354,39 @@ def test_claude_5_registered(model_id):
     async_model = llm.get_async_model(model_id)
     assert async_model.model_id == "anthropic/" + model_id
     assert async_model.claude_model_id == model_id
+
+
+@pytest.mark.parametrize(
+    "alias,model_id",
+    (("claude-opus-5.5", "claude-opus-5-5"), ("claude-sonnet-5.5", "claude-sonnet-5-5")),
+)
+def test_claude_5_5_aliases(alias, model_id):
+    assert llm.get_model(alias).claude_model_id == model_id
+
+
+@pytest.mark.parametrize("model_id", ("claude-opus-5-5", "claude-sonnet-5-5"))
+def test_claude_5_5_never_disables_thinking(model_id):
+    # thinking {"type": "disabled"} and budget_tokens both 400 on these models:
+    # without a thinking option the request must carry no thinking field at all.
+    model = llm.get_model(model_id)
+    prompt = llm.Prompt("Hi", model, options=model.Options())
+    kwargs = model.build_kwargs(prompt, None)
+    assert "thinking" not in kwargs
+    assert "betas" not in kwargs
+    assert kwargs["max_tokens"] == 128000
+    assert kwargs["temperature"] == 1.0
+
+
+def test_claude_5_5_schema_uses_structured_outputs():
+    # Forced tool_choice returns a 400 on the 5.5 models: schemas must go
+    # through output_config.format, never the output_structured_data tool.
+    model = llm.get_model("claude-sonnet-5-5")
+    prompt = llm.Prompt(
+        "Hi", model, schema={"type": "object", "properties": {}}, options=model.Options()
+    )
+    kwargs = model.build_kwargs(prompt, None)
+    assert "tool_choice" not in kwargs
+    assert kwargs["output_config"]["format"]["type"] == "json_schema"
 
 
 def test_opus_5_default_kwargs():

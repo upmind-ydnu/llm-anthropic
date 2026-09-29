@@ -395,6 +395,54 @@ def register_models(register):
         ),
         aliases=("claude-opus-5",),
     )
+    # claude-opus-5-5
+    register(
+        ClaudeMessages(
+            "claude-opus-5-5",
+            supports_pdf=True,
+            supports_thinking=True,
+            supports_thinking_effort=True,
+            supports_adaptive_thinking=True,
+            supports_web_search=True,
+            use_structured_outputs=True,
+            default_max_tokens=128000,
+        ),
+        AsyncClaudeMessages(
+            "claude-opus-5-5",
+            supports_pdf=True,
+            supports_thinking=True,
+            supports_thinking_effort=True,
+            supports_adaptive_thinking=True,
+            supports_web_search=True,
+            use_structured_outputs=True,
+            default_max_tokens=128000,
+        ),
+        aliases=("claude-opus-5-5", "claude-opus-5.5"),
+    )
+    # claude-sonnet-5-5
+    register(
+        ClaudeMessages(
+            "claude-sonnet-5-5",
+            supports_pdf=True,
+            supports_thinking=True,
+            supports_thinking_effort=True,
+            supports_adaptive_thinking=True,
+            supports_web_search=True,
+            use_structured_outputs=True,
+            default_max_tokens=128000,
+        ),
+        AsyncClaudeMessages(
+            "claude-sonnet-5-5",
+            supports_pdf=True,
+            supports_thinking=True,
+            supports_thinking_effort=True,
+            supports_adaptive_thinking=True,
+            supports_web_search=True,
+            use_structured_outputs=True,
+            default_max_tokens=128000,
+        ),
+        aliases=("claude-sonnet-5-5", "claude-sonnet-5.5"),
+    )
 
 
 class ClaudeOptions(llm.Options):
